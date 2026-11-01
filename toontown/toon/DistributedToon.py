@@ -96,16 +96,20 @@ class DistributedToon(DistributedPlayer.DistributedPlayer, Toon.Toon, Distribute
         self.cogTypes = [0,
          0,
          0,
+         0,
          0]
         self.cogLevels = [0,
+         0,
          0,
          0,
          0]
         self.cogParts = [0,
          0,
          0,
+         0,
          0]
         self.cogMerits = [0,
+         0,
          0,
          0,
          0]
@@ -873,30 +877,36 @@ class DistributedToon(DistributedPlayer.DistributedPlayer, Toon.Toon, Distribute
         return
 
     def setCogStatus(self, cogStatusList):
-        self.cogs = cogStatusList
+        numTypes = len(SuitDNA.suitHeadTypes)
+        self.cogs = list(cogStatusList) + [1] * max(0, numTypes - len(cogStatusList))
 
     def setCogCount(self, cogCountList):
-        self.cogCounts = cogCountList
+        numTypes = len(SuitDNA.suitHeadTypes)
+        self.cogCounts = list(cogCountList) + [0] * max(0, numTypes - len(cogCountList))
         if hasattr(self, 'suitPage'):
             self.suitPage.updatePage()
 
     def setCogRadar(self, radar):
-        self.cogRadar = radar
+        numDepts = len(SuitDNA.suitDepts)
+        self.cogRadar = list(radar) + [0] * max(0, numDepts - len(radar))
         if hasattr(self, 'suitPage'):
-            self.suitPage.updateCogRadarButtons(radar)
+            self.suitPage.updateCogRadarButtons(self.cogRadar)
 
     def setBuildingRadar(self, radar):
-        self.buildingRadar = radar
+        numDepts = len(SuitDNA.suitDepts)
+        self.buildingRadar = list(radar) + [0] * max(0, numDepts - len(radar))
         if hasattr(self, 'suitPage'):
-            self.suitPage.updateBuildingRadarButtons(radar)
+            self.suitPage.updateBuildingRadarButtons(self.buildingRadar)
 
     def setCogTypes(self, types):
-        self.cogTypes = types
+        numDepts = len(SuitDNA.suitDepts)
+        self.cogTypes = list(types) + [0] * max(0, numDepts - len(types))
         if self.disguisePage:
             self.disguisePage.updatePage()
 
     def setCogLevels(self, levels):
-        self.cogLevels = levels
+        numDepts = len(SuitDNA.suitDepts)
+        self.cogLevels = list(levels) + [0] * max(0, numDepts - len(levels))
         if self.disguisePage:
             self.disguisePage.updatePage()
 
@@ -904,7 +914,8 @@ class DistributedToon(DistributedPlayer.DistributedPlayer, Toon.Toon, Distribute
         return self.cogLevels
 
     def setCogParts(self, parts):
-        self.cogParts = parts
+        numDepts = len(SuitDNA.suitDepts)
+        self.cogParts = list(parts) + [0] * max(0, numDepts - len(parts))
         if self.disguisePage:
             self.disguisePage.updatePage()
 
@@ -912,7 +923,8 @@ class DistributedToon(DistributedPlayer.DistributedPlayer, Toon.Toon, Distribute
         return self.cogParts
 
     def setCogMerits(self, merits):
-        self.cogMerits = merits
+        numDepts = len(SuitDNA.suitDepts)
+        self.cogMerits = list(merits) + [0] * max(0, numDepts - len(merits))
         if self.disguisePage:
             self.disguisePage.updatePage()
 
@@ -1811,7 +1823,8 @@ class DistributedToon(DistributedPlayer.DistributedPlayer, Toon.Toon, Distribute
         messenger.send('cog-summons-response', [returnCode, suitIndex, doId])
 
     def setCogSummonsEarned(self, cogSummonsEarned):
-        self.cogSummonsEarned = cogSummonsEarned
+        numTypes = len(SuitDNA.suitHeadTypes)
+        self.cogSummonsEarned = list(cogSummonsEarned) + [0] * max(0, numTypes - len(cogSummonsEarned))
 
     def getCogSummonsEarned(self):
         return self.cogSummonsEarned

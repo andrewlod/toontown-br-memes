@@ -541,6 +541,9 @@ class RewardPanel(DirectFrame):
             self.deptIcon = icons.find('**/MoneyIcon').copyTo(self.promotionFrame)
         elif dept == 3:
             self.deptIcon = icons.find('**/SalesIcon').copyTo(self.promotionFrame)
+        else:
+            # PropinaBot reuses the Bossbot icon.
+            self.deptIcon = icons.find('**/CorpIcon').copyTo(self.promotionFrame)
         icons.removeNode()
         self.deptIcon.setPos(0, 0, -0.225)
         self.deptIcon.setScale(0.33)
@@ -794,7 +797,9 @@ class RewardPanel(DirectFrame):
          0], [], [], [], [0,
          0,
          0,
+         0,
          0], [0,
+         0,
          0,
          0,
          0], [], [base.localAvatar] + otherToons)

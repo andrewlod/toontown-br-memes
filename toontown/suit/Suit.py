@@ -71,6 +71,15 @@ tbc = (('cigar-smoke', 'cigar-smoke', 8),
  ('glower', 'glower', 5),
  ('song-and-dance', 'song-and-dance', 8),
  ('golf-club-swing', 'golf-club-swing', 5))
+# PropinaBot tiers reuse the Bossbot attack animations verbatim.
+pb1 = f
+pb2 = p
+pb3 = ym
+pb4 = mm
+pb5 = ds
+pb6 = hh
+pb7 = cr
+pb8 = tbc
 cc = (('speak', 'speak', 5),
  ('glower', 'glower', 5),
  ('phone', 'phone', 3.5),
@@ -164,6 +173,17 @@ else:
 HeadModelDict = {'a': ('/models/char/suitA-', 4),
  'b': ('/models/char/suitB-', 4),
  'c': ('/models/char/suitC-', 3.5)}
+# PropinaBot clones the Bossbot silhouettes.  Each entry is:
+# (scale, heads, height, headTexture)
+PropinaBotSuitInfo = {'pb1': (4.0 / cSize, ('flunky', 'glasses'), 4.88, None),
+ 'pb2': (3.35 / bSize, ('pencilpusher',), 5.0, None),
+ 'pb3': (4.125 / aSize, ('yesman',), 5.28, None),
+ 'pb4': (2.5 / cSize, ('micromanager',), 3.25, None),
+ 'pb5': (4.5 / bSize, ('beancounter',), 6.08, None),
+ 'pb6': (6.5 / aSize, ('headhunter',), 7.45, None),
+ 'pb7': (6.75 / cSize, ('flunky',), 8.23, 'corporate-raider.jpg'),
+ 'pb8': (7.0 / aSize, ('bigcheese',), 9.34, None)}
+PropinaBotBlackColor = Vec4(0.16, 0.16, 0.18, 1.0)
 
 def loadTutorialSuit():
     loader.loadModel('phase_3.5/models/char/suitC-mod').node()
@@ -603,6 +623,17 @@ class Suit(Avatar.Avatar):
             self.generateBody()
             self.generateHead('yesman')
             self.setHeight(8.95)
+        elif dna.name in PropinaBotSuitInfo:
+            scale, heads, height, headTexture = PropinaBotSuitInfo[dna.name]
+            self.scale = scale
+            self.handColor = SuitDNA.propinaPolyColor
+            self.generateBody()
+            if headTexture:
+                self.headTexture = headTexture
+            for head in heads:
+                self.generateHead(head)
+            self.setHeight(height)
+            self.tintSuitBlack()
         self.setName(SuitBattleGlobals.SuitAttributes[dna.name]['name'])
         self.getGeomNode().setScale(self.scale)
         self.generateHealthBar()
@@ -621,6 +652,14 @@ class Suit(Avatar.Avatar):
             self.loadModel('phase_3.5' + filePrefix + 'mod')
         self.loadAnims(animDict)
         self.setSuitClothes()
+
+    def tintSuitBlack(self):
+        # Runtime-only black suit: multiply the existing suit textures instead
+        # of shipping new black textures.  Heads are left untouched.
+        for partName in ('**/torso', '**/arms', '**/legs', '**/body'):
+            part = self.find(partName)
+            if not part.isEmpty():
+                part.setColorScale(PropinaBotBlackColor)
 
     def generateAnimDict(self):
         animDict = {}
@@ -674,6 +713,10 @@ class Suit(Avatar.Avatar):
         if not modelRoot:
             modelRoot = self
         dept = self.style.dept
+        if dept == 'q':
+            # PropinaBots reuse the Bossbot suit textures; the black tint is
+            # applied at runtime by tintSuitBlack().
+            dept = 'c'
         phase = 3.5
 
         def __doItTheOldWay__():
@@ -781,6 +824,8 @@ class Suit(Avatar.Avatar):
         if not modelPath:
             modelPath = self
         dept = self.style.dept
+        if dept == 'q':
+            dept = 'c'
         tie = modelPath.find('**/tie')
         if tie.isEmpty():
             self.notify.warning('skelecog has no tie model!!!')
@@ -800,6 +845,8 @@ class Suit(Avatar.Avatar):
     def generateCorporateMedallion(self):
         icons = loader.loadModel('phase_3/models/gui/cog_icons')
         dept = self.style.dept
+        if dept == 'q':
+            dept = 'c'
         if ConfigVariableBool('want-new-cogs', 0).value:
             chestNull = self.find('**/def_joint_attachMeter')
             if chestNull.isEmpty():
@@ -955,6 +1002,8 @@ class Suit(Avatar.Avatar):
         self.loadModel(model)
         self.loadAnims(anims)
         self.getGeomNode().setScale(self.scale * 1.0173)
+        if self.style.dept == 'q':
+            self.tintSuitBlack()
         self.generateHealthBar()
         self.generateCorporateMedallion()
         self.generateCorporateTie()

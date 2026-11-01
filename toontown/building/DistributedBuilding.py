@@ -21,7 +21,8 @@ from toontown.hood import ZoneUtil
 FO_DICT = {'s': 'tt_m_ara_cbe_fieldOfficeMoverShaker',
  'l': 'tt_m_ara_cbe_fieldOfficeMoverShaker',
  'm': 'tt_m_ara_cbe_fieldOfficeMoverShaker',
- 'c': 'tt_m_ara_cbe_fieldOfficeMoverShaker'}
+ 'c': 'tt_m_ara_cbe_fieldOfficeMoverShaker',
+ 'q': 'tt_m_ara_cbe_fieldOfficeMoverShaker'}
 
 class DistributedBuilding(DistributedObject.DistributedObject):
     SUIT_INIT_HEIGHT = 125
@@ -318,6 +319,9 @@ class DistributedBuilding(DistributedObject.DistributedObject):
             self.cab = self.elevatorModel.find('**/elevator')
             cogIcons = loader.loadModel('phase_3/models/gui/cog_icons')
             dept = chr(self.track)
+            if dept == 'q':
+                # PropinaBot uses the Bossbot elevator icon/medallion.
+                dept = 'c'
             if dept == 'c':
                 corpIcon = cogIcons.find('**/CorpIcon').copyTo(self.cab)
             elif dept == 's':
@@ -435,7 +439,11 @@ class DistributedBuilding(DistributedObject.DistributedObject):
     def setupSuitBuilding(self, nodePath):
         dnaStore = self.cr.playGame.dnaStore
         level = int(self.difficulty / 2) + 1
-        suitNP = dnaStore.findNode('suit_landmark_' + chr(self.track) + str(level))
+        modelDept = chr(self.track)
+        if modelDept == 'q':
+            # No PropinaBot landmark art exists; reuse the Bossbot building.
+            modelDept = 'c'
+        suitNP = dnaStore.findNode('suit_landmark_' + modelDept + str(level))
         zoneId = dnaStore.getZoneFromBlockNumber(self.block)
         zoneId = ZoneUtil.getTrueZoneId(zoneId, self.interiorZoneId)
         newParentNP = base.cr.playGame.hood.loader.zoneDict[zoneId]

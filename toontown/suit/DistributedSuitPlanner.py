@@ -2,6 +2,7 @@ from panda3d.core import *
 from direct.distributed import DistributedObject
 from . import SuitPlannerBase
 from toontown.toonbase import ToontownGlobals
+from toontown.suit import SuitDNA
 
 class DistributedSuitPlanner(DistributedObject.DistributedObject, SuitPlannerBase.SuitPlannerBase):
 
@@ -9,10 +10,7 @@ class DistributedSuitPlanner(DistributedObject.DistributedObject, SuitPlannerBas
         DistributedObject.DistributedObject.__init__(self, cr)
         SuitPlannerBase.SuitPlannerBase.__init__(self)
         self.suitList = []
-        self.buildingList = [0,
-         0,
-         0,
-         0]
+        self.buildingList = [0] * len(SuitDNA.suitDepts)
         self.pathViz = None
         return
 
@@ -39,7 +37,8 @@ class DistributedSuitPlanner(DistributedObject.DistributedObject, SuitPlannerBas
         self.sendUpdate('buildingListQuery')
 
     def buildingListResponse(self, buildingList):
-        self.buildingList = buildingList
+        numDepts = len(SuitDNA.suitDepts)
+        self.buildingList = list(buildingList) + [0] * max(0, numDepts - len(buildingList))
         messenger.send('buildingListResponse')
 
     def hidePaths(self):

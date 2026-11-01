@@ -98,16 +98,20 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.cogTypes = [0,
          0,
          0,
+         0,
          0]
         self.cogLevel = [0,
+         0,
          0,
          0,
          0]
         self.cogParts = [0,
          0,
          0,
+         0,
          0]
         self.cogRadar = [0,
+         0,
          0,
          0,
          0]
@@ -115,6 +119,7 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.disguisePageFlag = 0
         self.sosPageFlag = 0
         self.buildingRadar = [0,
+         0,
          0,
          0,
          0]
@@ -1172,7 +1177,11 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
 
     def setCogStatus(self, cogStatusList):
         self.notify.debug('setting cogs to %s' % cogStatusList)
-        self.cogs = cogStatusList
+        numTypes = len(SuitDNA.suitHeadTypes)
+        if not cogStatusList:
+            self.cogs = [1] * numTypes
+        else:
+            self.cogs = list(cogStatusList) + [1] * max(0, numTypes - len(cogStatusList))
 
     def d_setCogStatus(self, cogStatusList):
         self.sendUpdate('setCogStatus', [cogStatusList])
@@ -1186,7 +1195,11 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
 
     def setCogCount(self, cogCountList):
         self.notify.debug('setting cogCounts to %s' % cogCountList)
-        self.cogCounts = cogCountList
+        numTypes = len(SuitDNA.suitHeadTypes)
+        if not cogCountList:
+            self.cogCounts = [0] * numTypes
+        else:
+            self.cogCounts = list(cogCountList) + [0] * max(0, numTypes - len(cogCountList))
 
     def d_setCogCount(self, cogCountList):
         self.sendUpdate('setCogCount', [cogCountList])
@@ -1199,14 +1212,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setCogRadar(radar)
 
     def setCogRadar(self, radar):
+        numDepts = len(SuitDNA.suitDepts)
         if not radar:
-            self.notify.warning('cogRadar set to bad value: %s. Resetting to [0,0,0,0]' % radar)
-            self.cogRadar = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('cogRadar set to bad value: %s. Resetting to all zeroes.' % radar)
+            self.cogRadar = [0] * numDepts
         else:
-            self.cogRadar = radar
+            self.cogRadar = list(radar) + [0] * (numDepts - len(radar))
 
     def d_setCogRadar(self, radar):
         self.sendUpdate('setCogRadar', [radar])
@@ -1219,14 +1230,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setBuildingRadar(radar)
 
     def setBuildingRadar(self, radar):
+        numDepts = len(SuitDNA.suitDepts)
         if not radar:
-            self.notify.warning('buildingRadar set to bad value: %s. Resetting to [0,0,0,0]' % radar)
-            self.buildingRadar = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('buildingRadar set to bad value: %s. Resetting to all zeroes.' % radar)
+            self.buildingRadar = [0] * numDepts
         else:
-            self.buildingRadar = radar
+            self.buildingRadar = list(radar) + [0] * (numDepts - len(radar))
 
     def d_setBuildingRadar(self, radar):
         self.sendUpdate('setBuildingRadar', [radar])
@@ -1239,14 +1248,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setCogTypes(types)
 
     def setCogTypes(self, types):
+        numDepts = len(SuitDNA.suitDepts)
         if not types:
-            self.notify.warning('cogTypes set to bad value: %s. Resetting to [0,0,0,0]' % types)
-            self.cogTypes = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('cogTypes set to bad value: %s. Resetting to all zeroes.' % types)
+            self.cogTypes = [0] * numDepts
         else:
-            self.cogTypes = types
+            self.cogTypes = list(types) + [0] * (numDepts - len(types))
 
     def d_setCogTypes(self, types):
         self.sendUpdate('setCogTypes', [types])
@@ -1259,14 +1266,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setCogLevels(levels)
 
     def setCogLevels(self, levels):
+        numDepts = len(SuitDNA.suitDepts)
         if not levels:
-            self.notify.warning('cogLevels set to bad value: %s. Resetting to [0,0,0,0]' % levels)
-            self.cogLevels = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('cogLevels set to bad value: %s. Resetting to all zeroes.' % levels)
+            self.cogLevels = [0] * numDepts
         else:
-            self.cogLevels = levels
+            self.cogLevels = list(levels) + [0] * (numDepts - len(levels))
 
     def d_setCogLevels(self, levels):
         self.sendUpdate('setCogLevels', [levels])
@@ -1318,14 +1323,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setCogParts(parts)
 
     def setCogParts(self, parts):
+        numDepts = len(SuitDNA.suitDepts)
         if not parts:
-            self.notify.warning('cogParts set to bad value: %s. Resetting to [0,0,0,0]' % parts)
-            self.cogParts = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('cogParts set to bad value: %s. Resetting to all zeroes.' % parts)
+            self.cogParts = [0] * numDepts
         else:
-            self.cogParts = parts
+            self.cogParts = list(parts) + [0] * (numDepts - len(parts))
 
     def d_setCogParts(self, parts):
         self.sendUpdate('setCogParts', [parts])
@@ -1387,14 +1390,12 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.d_setCogMerits(merits)
 
     def setCogMerits(self, merits):
+        numDepts = len(SuitDNA.suitDepts)
         if not merits:
-            self.notify.warning('cogMerits set to bad value: %s. Resetting to [0,0,0,0]' % merits)
-            self.cogMerits = [0,
-             0,
-             0,
-             0]
+            self.notify.warning('cogMerits set to bad value: %s. Resetting to all zeroes.' % merits)
+            self.cogMerits = [0] * numDepts
         else:
-            self.cogMerits = merits
+            self.cogMerits = list(merits) + [0] * (numDepts - len(merits))
 
     def d_setCogMerits(self, merits):
         self.sendUpdate('setCogMerits', [merits])
@@ -3256,7 +3257,11 @@ class DistributedToonAI(DistributedPlayerAI.DistributedPlayerAI, DistributedSmoo
         self.sendUpdate('setCogSummonsEarned', [cogSummonsEarned])
 
     def setCogSummonsEarned(self, cogSummonsEarned):
-        self.cogSummonsEarned = cogSummonsEarned
+        numTypes = len(SuitDNA.suitHeadTypes)
+        if not cogSummonsEarned:
+            self.cogSummonsEarned = [0] * numTypes
+        else:
+            self.cogSummonsEarned = list(cogSummonsEarned) + [0] * max(0, numTypes - len(cogSummonsEarned))
 
     def getCogSummonsEarned(self):
         return self.cogSummonsEarned

@@ -2882,7 +2882,25 @@ SuitAttributes = {'f': {'name': TTLocalizer.SuitFlunky,
                       50,
                       50,
                       50,
-                      50)))}}
+                      50)))}} 
+# PropinaBot is a clone of the Bossbot department. Each tier copies the
+# attributes of the matching Bossbot cog and only replaces the display names.
+PropinaBotSuitNames = (
+ ('pb1', 'f', TTLocalizer.SuitRenanBolsonaro, TTLocalizer.SuitRenanBolsonaroS, TTLocalizer.SuitRenanBolsonaroP),
+ ('pb2', 'p', TTLocalizer.SuitNikolasFerreira, TTLocalizer.SuitNikolasFerreiraS, TTLocalizer.SuitNikolasFerreiraP),
+ ('pb3', 'ym', TTLocalizer.SuitErikaHilton, TTLocalizer.SuitErikaHiltonS, TTLocalizer.SuitErikaHiltonP),
+ ('pb4', 'mm', TTLocalizer.SuitKimKataguiri, TTLocalizer.SuitKimKataguiriS, TTLocalizer.SuitKimKataguiriP),
+ ('pb5', 'ds', TTLocalizer.SuitEduardoCunha, TTLocalizer.SuitEduardoCunhaS, TTLocalizer.SuitEduardoCunhaP),
+ ('pb6', 'hh', TTLocalizer.SuitDilmaRousseff, TTLocalizer.SuitDilmaRousseffS, TTLocalizer.SuitDilmaRousseffP),
+ ('pb7', 'cr', TTLocalizer.SuitAlexandreDeMoraes, TTLocalizer.SuitAlexandreDeMoraesS, TTLocalizer.SuitAlexandreDeMoraesP),
+ ('pb8', 'tbc', TTLocalizer.SuitDanielVorcaro, TTLocalizer.SuitDanielVorcaroS, TTLocalizer.SuitDanielVorcaroP))
+for _propinaName, _bossbotName, _name, _singular, _plural in PropinaBotSuitNames:
+    _attributes = dict(SuitAttributes[_bossbotName])
+    _attributes['name'] = _name
+    _attributes['singularname'] = _singular
+    _attributes['pluralname'] = _plural
+    SuitAttributes[_propinaName] = _attributes
+del _propinaName, _bossbotName, _name, _singular, _plural, _attributes
 ATK_TGT_UNKNOWN = 1
 ATK_TGT_SINGLE = 2
 ATK_TGT_GROUP = 3

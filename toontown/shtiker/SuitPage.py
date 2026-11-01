@@ -14,19 +14,23 @@ RADAR_DELAY = 0.2
 BUILDING_RADAR_POS = (0.375,
  0.065,
  -0.225,
- -0.5)
+ -0.5,
+ -0.775)
 PANEL_COLORS = (Vec4(0.8, 0.78, 0.77, 1),
  Vec4(0.75, 0.78, 0.8, 1),
  Vec4(0.75, 0.82, 0.79, 1),
- Vec4(0.825, 0.76, 0.77, 1))
+ Vec4(0.825, 0.76, 0.77, 1),
+ Vec4(0.62, 0.62, 0.64, 1))
 PANEL_COLORS_COMPLETE1 = (Vec4(0.7, 0.725, 0.545, 1),
  Vec4(0.625, 0.725, 0.65, 1),
  Vec4(0.6, 0.75, 0.525, 1),
- Vec4(0.675, 0.675, 0.55, 1))
+ Vec4(0.675, 0.675, 0.55, 1),
+ Vec4(0.52, 0.535, 0.47, 1))
 PANEL_COLORS_COMPLETE2 = (Vec4(0.9, 0.725, 0.32, 1),
  Vec4(0.825, 0.725, 0.45, 1),
  Vec4(0.8, 0.75, 0.325, 1),
- Vec4(0.875, 0.675, 0.35, 1))
+ Vec4(0.875, 0.675, 0.35, 1),
+ Vec4(0.7, 0.61, 0.24, 1))
 SHADOW_SCALE_POS = ((1.225,
   0,
   10,
@@ -196,6 +200,11 @@ class SuitPage(ShtikerPage.ShtikerPage):
         icon = icons.find('**/sales_icon')
         self.salesRadarButton = DirectButton(parent=self.iconNode, relief=None, state=DGG.DISABLED, image=(icon, icon, icon), image_scale=(0.03375, 1, 0.045), image2_color=Vec4(1.0, 1.0, 1.0, 0.75), pos=(-0.2, 10, -0.575), command=self.toggleRadar, extraArgs=[3])
         self.radarButtons.append(self.salesRadarButton)
+        # PropinaBot has no dedicated radar icon in the shipped GUI, so reuse
+        # the Bossbot icon and offset it below the originals.
+        icon = icons.find('**/corp_icon')
+        self.propinaRadarButton = DirectButton(parent=self.iconNode, relief=None, state=DGG.DISABLED, image=icon, image_scale=(0.03375, 1, 0.045), image_pos=(0, 0, -0.075), image2_color=Vec4(1.0, 1.0, 1.0, 0.75), pos=(-0.2, 10, -0.575), command=self.toggleRadar, extraArgs=[4])
+        self.radarButtons.append(self.propinaRadarButton)
         for radarButton in self.radarButtons:
             radarButton.building = 0
             radarButton.buildingRadarLabel = None
@@ -203,15 +212,14 @@ class SuitPage(ShtikerPage.ShtikerPage):
         gui = loader.loadModel('phase_3.5/models/gui/suitpage_gui')
         self.panelModel = gui.find('**/card')
         self.shadowModels = []
-        for index in range(1, len(SuitDNA.suitHeadTypes) + 1):
+        # The shipped GUI only contains 32 shadow models (four departments).
+        # The fifth department reuses them via modulo in addSuitHead().
+        for index in range(1, 33):
             self.shadowModels.append(gui.find('**/shadow' + str(index)))
 
         del gui
         self.makePanels()
-        self.radarOn = [0,
-         0,
-         0,
-         0]
+        self.radarOn = [0] * len(SuitDNA.suitDepts)
         priceScale = 0.1
         emblemIcon = loader.loadModel('phase_3.5/models/gui/tt_m_gui_gen_emblemIcons')
         silverModel = emblemIcon.find('**/tt_t_gui_gen_emblemSilver')
@@ -232,6 +240,7 @@ class SuitPage(ShtikerPage.ShtikerPage):
         self.legalRadarButton.destroy()
         self.moneyRadarButton.destroy()
         self.salesRadarButton.destroy()
+        self.propinaRadarButton.destroy()
         for panel in self.panels:
             panel.destroy()
 
@@ -337,7 +346,7 @@ class SuitPage(ShtikerPage.ShtikerPage):
         xStart = -0.66
         yStart = -0.18
         xOffset = 0.199
-        yOffset = 0.284
+        yOffset = 0.22
         for dept in range(0, len(SuitDNA.suitDepts)):
             row = []
             color = PANEL_COLORS[dept]
@@ -370,9 +379,9 @@ class SuitPage(ShtikerPage.ShtikerPage):
     def addSuitHead(self, panel, suitName):
         panelIndex = self.panels.index(panel)
         shadow = panel.attachNewNode('shadow')
-        shadowModel = self.shadowModels[panelIndex]
+        shadowModel = self.shadowModels[panelIndex % len(self.shadowModels)]
         shadowModel.copyTo(shadow)
-        coords = SHADOW_SCALE_POS[panelIndex]
+        coords = SHADOW_SCALE_POS[panelIndex % len(SHADOW_SCALE_POS)]
         shadow.setScale(coords[0])
         shadow.setPos(coords[1], coords[2], coords[3])
         panel.shadow = shadow
@@ -483,16 +492,17 @@ class SuitPage(ShtikerPage.ShtikerPage):
         cogs = base.localAvatar.cogs
         for dept in range(0, len(SuitDNA.suitDepts)):
             for type in range(0, SuitDNA.suitsPerDept):
-                self.updateCogStatus(dept, type, cogs[index])
+                status = cogs[index] if index < len(cogs) else COG_UNSEEN
+                self.updateCogStatus(dept, type, status)
                 index += 1
 
         self.updateCogRadarButtons(base.localAvatar.cogRadar)
         self.updateBuildingRadarButtons(base.localAvatar.buildingRadar)
 
     def updateCogStatus(self, dept, type, status):
-        if dept < 0 or dept > len(SuitDNA.suitDepts):
+        if dept < 0 or dept >= len(SuitDNA.suitDepts):
             print('ucs: bad cog dept: ', dept)
-        elif type < 0 or type > SuitDNA.suitsPerDept:
+        elif type < 0 or type >= SuitDNA.suitsPerDept:
             print('ucs: bad cog type: ', type)
         elif status < COG_UNSEEN or status > COG_COMPLETE2:
             print('ucs: bad status: ', status)
@@ -564,16 +574,13 @@ class SuitPage(ShtikerPage.ShtikerPage):
         if not timeout and hasattr(base.cr, 'currSuitPlanner') and base.cr.currSuitPlanner != None:
             buildingList = base.cr.currSuitPlanner.buildingList
         else:
-            buildingList = [0,
-             0,
-             0,
-             0]
+            buildingList = [0] * len(SuitDNA.suitDepts)
         button = self.radarButtons[deptNum]
         if button.building:
             if not button.buildingRadarLabel:
                 self.addBuildingRadarLabel(button)
             if self.radarOn[deptNum]:
-                num = buildingList[deptNum]
+                num = buildingList[deptNum] if deptNum < len(buildingList) else 0
                 if num == 1:
                     button.buildingRadarLabel['text'] = TTLocalizer.SuitPageBuildingRadarS % num
                 else:

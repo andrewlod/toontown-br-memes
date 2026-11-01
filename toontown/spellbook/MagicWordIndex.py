@@ -278,8 +278,8 @@ class MaxToon(MagicWord):
         toon.b_setRewardHistory(Quests.LOOPING_FINAL_TIER, [])
 
         toon.b_setCogParts([*CogDisguiseGlobals.PartsPerSuitBitmasks])
-        toon.b_setCogTypes([SuitDNA.suitsPerDept - 1] * 4)
-        toon.b_setCogLevels([ToontownGlobals.MaxCogSuitLevel] * 4)
+        toon.b_setCogTypes([SuitDNA.suitsPerDept - 1] * len(SuitDNA.suitDepts))
+        toon.b_setCogLevels([ToontownGlobals.MaxCogSuitLevel] * len(SuitDNA.suitDepts))
 
         return f"Successfully maxed {toon.getName()}!"
     

@@ -27,9 +27,9 @@ def getBattleExperience(numToons, activeToons, toonExp, toonSkillPtsGained, toon
             p.append([])
             p.append([])
             p.append([])
-            p.append([0, 0, 0, 0])
-            p.append([0, 0, 0, 0])
-            p.append([0, 0, 0, 0])
+            p.append([0] * len(SuitDNA.suitDepts))
+            p.append([0] * len(SuitDNA.suitDepts))
+            p.append([0] * len(SuitDNA.suitDepts))
         else:
             p.append(toonId)
             origExp = toonExp[toonId]
@@ -44,11 +44,11 @@ def getBattleExperience(numToons, activeToons, toonExp, toonSkillPtsGained, toon
             items = toonItems.get(toonId, ([], []))
             p.append(items[0])
             p.append(items[1])
-            origMerits = toonOrigMerits.get(toonId, [])
+            origMerits = toonOrigMerits.get(toonId, [0] * len(SuitDNA.suitDepts))
             p.append(origMerits)
-            merits = toonMerits.get(toonId, [0, 0, 0, 0])
+            merits = toonMerits.get(toonId, [0] * len(SuitDNA.suitDepts))
             p.append(merits)
-            parts = toonParts.get(toonId, [0, 0, 0, 0])
+            parts = toonParts.get(toonId, [0] * len(SuitDNA.suitDepts))
             p.append(parts)
 
     deathList = []

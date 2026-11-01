@@ -6,6 +6,7 @@ from direct.fsm import ClassicFSM, State
 from toontown.battle.BattleBase import *
 from . import CogDisguiseGlobals
 from toontown.toonbase.ToontownBattleGlobals import getStageCreditMultiplier
+from toontown.suit import SuitDNA
 from direct.showbase.PythonUtil import addListsByValue
 from otp.otpbase.PythonUtil import enumerate
 
@@ -33,8 +34,7 @@ class DistributedStageBattleAI(DistributedLevelBattleAI.DistributedLevelBattleAI
             self.suitsKilledPerFloor[floor].extend(self.suitsKilledThisBattle)
 
     def handleToonsWon(self, toons):
-        extraMerits = [
-         0, 0, 0, 0]
+        extraMerits = [0] * len(SuitDNA.suitDepts)
         amount = ToontownGlobals.StageNoticeRewards[self.level.stageId]
         index = ToontownGlobals.cogHQZoneId2deptIndex(self.level.stageId)
         extraMerits[index] = amount

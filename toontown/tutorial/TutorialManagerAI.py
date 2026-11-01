@@ -8,6 +8,7 @@ from toontown.building import TutorialHQBuildingAI
 from . import SuitPlannerTutorialAI
 from toontown.toonbase import ToontownBattleGlobals
 from toontown.toon import NPCToons
+from toontown.suit import SuitDNA
 from toontown.ai import BlackCatHolidayMgrAI
 from toontown.ai import DistributedBlackCatMgrAI
 
@@ -98,8 +99,8 @@ class TutorialManagerAI(DistributedObjectAI.DistributedObjectAI):
             av.inventory.addItem(ToontownBattleGlobals.SQUIRT_TRACK, 0)
             av.d_setInventory(av.inventory.makeNetString())
             # No cogs defeated
-            av.b_setCogStatus([1] * 32)
-            av.b_setCogCount([0] * 32)
+            av.b_setCogStatus([1] * len(SuitDNA.suitHeadTypes))
+            av.b_setCogCount([0] * len(SuitDNA.suitHeadTypes))
         return
 
     def allDone(self):

@@ -6,6 +6,7 @@ from direct.fsm import ClassicFSM, State
 from toontown.battle.BattleBase import *
 from . import CogDisguiseGlobals
 from toontown.toonbase.ToontownBattleGlobals import getMintCreditMultiplier
+from toontown.suit import SuitDNA
 from direct.showbase.PythonUtil import addListsByValue
 
 class DistributedMintBattleAI(DistributedLevelBattleAI.DistributedLevelBattleAI):
@@ -25,8 +26,7 @@ class DistributedMintBattleAI(DistributedLevelBattleAI.DistributedLevelBattleAI)
         return self.level.mintId
 
     def handleToonsWon(self, toons):
-        extraMerits = [
-         0, 0, 0, 0]
+        extraMerits = [0] * len(SuitDNA.suitDepts)
         amount = ToontownGlobals.MintCogBuckRewards[self.level.mintId]
         index = ToontownGlobals.cogHQZoneId2deptIndex(self.level.mintId)
         extraMerits[index] = amount

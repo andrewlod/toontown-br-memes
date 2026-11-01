@@ -51,13 +51,24 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
     BUILDING_HEIGHT_DISTRIBUTION = [
      14, 18, 25, 23, 20]
     TOTAL_BWEIGHT = 0
-    TOTAL_BWEIGHT_PER_TRACK = [
-     0, 0, 0, 0]
+    TOTAL_BWEIGHT_PER_TRACK = [0] * len(SuitDNA.suitDepts)
     TOTAL_BWEIGHT_PER_HEIGHT = [
      0, 0, 0, 0, 0]
     for currHoodInfo in SuitHoodInfo:
         weight = currHoodInfo[SUIT_HOOD_INFO_BWEIGHT]
         tracks = currHoodInfo[SUIT_HOOD_INFO_TRACK]
+        if len(tracks) < len(SuitDNA.suitDepts):
+            # The shipped hood tables only describe the four original
+            # departments.  Give PropinaBot a 10% share and rebalance the rest
+            # so every row still sums to 100.
+            oldTotal = float(sum(tracks)) or 1.0
+            newTracks = []
+            for trackWeight in tracks:
+                newTracks.append(int(round(trackWeight * 90.0 / oldTotal)))
+            newTracks.append(10)
+            tracks = newTracks
+            tracks[0] += 100 - sum(tracks)
+            currHoodInfo[SUIT_HOOD_INFO_TRACK] = tuple(tracks)
         levels = currHoodInfo[SUIT_HOOD_INFO_LVL]
         heights = [
          0, 0, 0, 0, 0]
@@ -68,10 +79,8 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
 
         currHoodInfo[SUIT_HOOD_INFO_HEIGHTS] = heights
         TOTAL_BWEIGHT += weight
-        TOTAL_BWEIGHT_PER_TRACK[0] += weight * tracks[0]
-        TOTAL_BWEIGHT_PER_TRACK[1] += weight * tracks[1]
-        TOTAL_BWEIGHT_PER_TRACK[2] += weight * tracks[2]
-        TOTAL_BWEIGHT_PER_TRACK[3] += weight * tracks[3]
+        for trackIndex in range(len(SuitDNA.suitDepts)):
+            TOTAL_BWEIGHT_PER_TRACK[trackIndex] += weight * tracks[trackIndex]
         TOTAL_BWEIGHT_PER_HEIGHT[0] += weight * heights[0]
         TOTAL_BWEIGHT_PER_HEIGHT[1] += weight * heights[1]
         TOTAL_BWEIGHT_PER_HEIGHT[2] += weight * heights[2]
@@ -756,13 +765,11 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
         totalWeight = self.TOTAL_BWEIGHT
         totalWeightPerTrack = self.TOTAL_BWEIGHT_PER_TRACK[:]
         totalWeightPerHeight = self.TOTAL_BWEIGHT_PER_HEIGHT[:]
-        numPerTrack = {'c': 0, 'l': 0, 'm': 0, 's': 0}
+        numPerTrack = dict((dept, 0) for dept in SuitDNA.suitDepts)
         for sp in list(self.air.suitPlanners.values()):
             sp.countNumBuildingsPerTrack(numPerTrack)
-            numPerTrack['c'] += sp.pendingBuildingTracks.count('c')
-            numPerTrack['l'] += sp.pendingBuildingTracks.count('l')
-            numPerTrack['m'] += sp.pendingBuildingTracks.count('m')
-            numPerTrack['s'] += sp.pendingBuildingTracks.count('s')
+            for dept in SuitDNA.suitDepts:
+                numPerTrack[dept] += sp.pendingBuildingTracks.count(dept)
 
         numPerHeight = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
         for sp in list(self.air.suitPlanners.values()):
@@ -776,7 +783,7 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
         while numToAssign > 0:
             smallestCount = None
             smallestTracks = []
-            for trackIndex in range(4):
+            for trackIndex in range(len(SuitDNA.suitDepts)):
                 if totalWeightPerTrack[trackIndex]:
                     track = SuitDNA.suitDepts[trackIndex]
                     count = numPerTrack[track]
@@ -833,10 +840,8 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
                     tracks = currHoodInfo[self.SUIT_HOOD_INFO_TRACK]
                     heights = currHoodInfo[self.SUIT_HOOD_INFO_HEIGHTS]
                     totalWeight -= weight
-                    totalWeightPerTrack[0] -= weight * tracks[0]
-                    totalWeightPerTrack[1] -= weight * tracks[1]
-                    totalWeightPerTrack[2] -= weight * tracks[2]
-                    totalWeightPerTrack[3] -= weight * tracks[3]
+                    for trackIndex in range(len(SuitDNA.suitDepts)):
+                        totalWeightPerTrack[trackIndex] -= weight * tracks[trackIndex]
                     totalWeightPerHeight[0] -= weight * heights[0]
                     totalWeightPerHeight[1] -= weight * heights[1]
                     totalWeightPerHeight[2] -= weight * heights[2]
@@ -1132,7 +1137,7 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
     def buildingListQuery(self):
         buildingDict = {}
         self.countNumBuildingsPerTrack(buildingDict)
-        buildingList = [0, 0, 0, 0]
+        buildingList = [0] * len(SuitDNA.suitDepts)
         for dept in SuitDNA.suitDepts:
             if dept in buildingDict:
                 buildingList[SuitDNA.suitDepts.index(dept)] = buildingDict[dept]

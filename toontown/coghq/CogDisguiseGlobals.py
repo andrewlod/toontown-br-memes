@@ -5,11 +5,13 @@ from enum import IntEnum
 PartsPerSuit = (17,
  14,
  12,
- 10)
+ 10,
+ 17)
 PartsPerSuitBitmasks = (131071,
  130175,
  56447,
- 56411)
+ 56411,
+ 131071)
 AllBits = 131071
 MinPartLoss = 2
 MaxPartLoss = 4
@@ -325,6 +327,8 @@ MeritsPerLevel = ((100,
   2360,
   5500,
   0))
+# PropinaBot uses the same promotion ladder as Bossbot.
+MeritsPerLevel = MeritsPerLevel + MeritsPerLevel[0:8]
 leftLegUpper = 1
 leftLegLower = 2
 leftLegFoot = 4

@@ -15,6 +15,7 @@ from toontown.ai import DatabaseObject
 from toontown.toon import DistributedToonAI
 from toontown.toon import InventoryBase
 from toontown.toonbase import ToontownGlobals
+from toontown.suit import SuitDNA
 import random
 from toontown.toon import NPCToons
 
@@ -517,10 +518,7 @@ class DistributedBattleBaseAI(DistributedObjectAI.DistributedObjectAI, BattleBas
         if avId not in self.toonOrigMerits:
             self.toonOrigMerits[avId] = toon.cogMerits[:]
         if avId not in self.toonMerits:
-            self.toonMerits[avId] = [0,
-             0,
-             0,
-             0]
+            self.toonMerits[avId] = [0] * len(SuitDNA.suitDepts)
         if avId not in self.toonOrigQuests:
             flattenedQuests = []
             for quest in toon.quests:

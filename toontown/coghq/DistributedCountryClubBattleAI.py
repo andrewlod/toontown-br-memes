@@ -6,6 +6,7 @@ from direct.fsm import ClassicFSM, State
 from toontown.battle.BattleBase import *
 from . import CogDisguiseGlobals
 from toontown.toonbase.ToontownBattleGlobals import getCountryClubCreditMultiplier
+from toontown.suit import SuitDNA
 from direct.showbase.PythonUtil import addListsByValue
 
 class DistributedCountryClubBattleAI(DistributedLevelBattleAI.DistributedLevelBattleAI):
@@ -25,8 +26,7 @@ class DistributedCountryClubBattleAI(DistributedLevelBattleAI.DistributedLevelBa
         return self.level.countryClubId
 
     def handleToonsWon(self, toons):
-        extraMerits = [
-         0, 0, 0, 0]
+        extraMerits = [0] * len(SuitDNA.suitDepts)
         amount = ToontownGlobals.CountryClubCogBuckRewards[self.level.countryClubId]
         index = ToontownGlobals.cogHQZoneId2deptIndex(self.level.countryClubId)
         extraMerits[index] = amount

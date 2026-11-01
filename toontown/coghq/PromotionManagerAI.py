@@ -18,15 +18,10 @@ class PromotionManagerAI:
 
     def recoverMerits(self, av, cogList, zoneId, multiplier = 1, extraMerits = None):
         avId = av.getDoId()
-        meritsRecovered = [0,
-         0,
-         0,
-         0]
+        numDepts = len(SuitDNA.suitDepts)
+        meritsRecovered = [0] * numDepts
         if extraMerits is None:
-            extraMerits = [0,
-             0,
-             0,
-             0]
+            extraMerits = [0] * numDepts
         if self.air.suitInvasionManager.getInvading():
             multiplier *= getInvasionMultiplier()
         for i in range(len(extraMerits)):
@@ -53,14 +48,8 @@ class PromotionManagerAI:
                     else:
                         self.notify.debug('recoverMerits: virtual cog!')
 
-        if meritsRecovered != [0,
-         0,
-         0,
-         0]:
-            actualCounted = [0,
-             0,
-             0,
-             0]
+        if any(meritsRecovered):
+            actualCounted = [0] * numDepts
             merits = av.getCogMerits()
             for i in range(len(meritsRecovered)):
                 max = CogDisguiseGlobals.getTotalMerits(av, i)
@@ -74,6 +63,6 @@ class PromotionManagerAI:
                     av.b_setCogMerits(merits)
 
             if reduce(lambda x, y: x + y, actualCounted):
-                self.air.writeServerEvent('merits', avId, '%s|%s|%s|%s' % tuple(actualCounted))
+                self.air.writeServerEvent('merits', avId, '|'.join(str(count) for count in actualCounted))
                 self.notify.debug('recoverMerits: av %s recovered merits %s' % (avId, actualCounted))
         return meritsRecovered
